@@ -2,7 +2,7 @@ name: Auto Report
 
 on:
   schedule:
-    - cron: '0 0 * * 1'  # 每週一的午夜執行
+    - cron: '0 0 * * 2'  # 每週一的午夜執行
   workflow_dispatch:  # 手動觸發
 
 jobs:
