@@ -49,9 +49,11 @@ driver.implicitly_wait(40)
 
 @retry(tries=3, delay=5)
 def open_website():
+    url = "https://app.1campus.net/"
+    logger.info(f"嘗試訪問網站: {url}")
     # 開啟目標網站
-    driver.get("https://app.1campus.net/")
-    logger.info(f"訪問網址: {driver.current_url}")
+    driver.get(url)
+    logger.info(f"正在訪問網站: {driver.current_url}")
     # 找到按鈕並點擊
     button = driver.find_element(By.CLASS_NAME, "btn-square")
     button.click()
@@ -60,7 +62,7 @@ def open_website():
 open_website()
 
 # 設置顯性等待
-wait = WebDriverWait(driver, 600)
+wait = WebDriverWait(driver, 60)
 
 # 找到並填寫帳號
 email_field = wait.until(EC.presence_of_element_located((By.ID, "identifierId")))
@@ -92,7 +94,7 @@ original_window = driver.current_window_handle
 
 # 切換到新分頁
 driver.switch_to.window(driver.window_handles[-1])
-logger.info(f"已切換到新分頁: {driver.current_url}")
+logger.info(f"已切換到新分頁，正在訪問網站: {driver.current_url}")
 
 # 等待頁面加載完成
 time.sleep(40)  # 根據實際情況調整等待時間
@@ -138,7 +140,7 @@ else:
 
 # 切換回原本的分頁
 driver.switch_to.window(original_window)
-logger.info(f"已切換回原本的分頁: {driver.current_url}")
+logger.info(f"已切換回原本的分頁，正在訪問網站: {driver.current_url}")
 
 # 找到並點擊學習週曆圖片
 try:
@@ -155,7 +157,7 @@ wait.until(lambda driver: len(driver.window_handles) > 2)
 
 # 切換到新分頁
 driver.switch_to.window(driver.window_handles[-1])
-logger.info(f"已切換到學習週曆的新分頁: {driver.current_url}")
+logger.info(f"已切換到學習週曆的新分頁，正在訪問網站: {driver.current_url}")
 
 # 找到並點擊「待填下週」的標籤
 try:
