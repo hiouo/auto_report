@@ -39,7 +39,7 @@ options.add_argument('--window-size=1920x1080')
 driver = webdriver.Chrome(service=service, options=options)
 
 # 設置隱性等待時間
-driver.implicitly_wait(40)
+driver.implicitly_wait(400)
 
 # 開啟目標網站
 driver.get("https://app.1campus.net/")
@@ -50,7 +50,7 @@ button.click()
 print("按鈕已點擊")
 
 # 設置顯性等待
-wait = WebDriverWait(driver, 60)
+wait = WebDriverWait(driver, 600)
 
 # 找到並填寫帳號
 email_field = wait.until(EC.presence_of_element_located((By.ID, "identifierId")))
