@@ -28,7 +28,14 @@ password = os.getenv('PASSWORD')
 service = Service(ChromeDriverManager().install())
 options = webdriver.ChromeOptions()
 
-# 不使用 headless 模式
+# 啟用無頭模式和其他參數
+options.add_argument('--headless')
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
+options.add_argument('--disable-gpu')
+options.add_argument('--window-size=1920x1080')
+
+# 初始化 WebDriver
 driver = webdriver.Chrome(service=service, options=options)
 
 # 設置隱性等待時間
@@ -105,10 +112,10 @@ if timetable_data:
         periods = entry.get('節次', '').split(',')
         for period in periods:
             period = period.strip()
-            if '1' in period or '2' in period or '3' in period or '4' in period:
+            if '1' in period或 '2' in period或 '3' in period或 '4' in period:
                 if not schedule_list[day][0]:
                     schedule_list[day][0].append(1)
-            elif '5' in period or '6' in period or '7' in period or '8' in period:
+            elif '5' in period或 '6' in period或 '7' in period或 '8' in period:
                 if not schedule_list[day][1]:
                     schedule_list[day][1].append(1)
 else:
