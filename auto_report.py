@@ -1,5 +1,6 @@
 import json
 import os
+import logging
 from datetime import datetime
 from seleniumwire import webdriver
 from selenium.webdriver.common.by import By
@@ -11,6 +12,10 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 from retry import retry
 
+# 設置日誌記錄
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger()
+
 # 設定學期第一週的開始日期（這個日期可以根據你的學校行事曆調整）
 semester_start_date = datetime(2024, 8, 30)  # 假設學期從 8 月 30 日開始
 
@@ -19,7 +24,7 @@ today = datetime.today()
 days_since_start = (today - semester_start_date).days
 current_week = days_since_start // 7 + 2  # 計算週數
 
-print(f"現在是第 {current_week} 週")
+logger.info(f"現在是第 {current_week} 週")
 
 # 從環境變數中讀取帳號和密碼
 username = os.getenv('USERNAME')
@@ -46,10 +51,11 @@ driver.implicitly_wait(40)
 def open_website():
     # 開啟目標網站
     driver.get("https://app.1campus.net/")
+    logger.info(f"訪問網址: {driver.current_url}")
     # 找到按鈕並點擊
     button = driver.find_element(By.CLASS_NAME, "btn-square")
     button.click()
-    print("按鈕已點擊")
+    logger.info("按鈕已點擊")
 
 open_website()
 
@@ -60,18 +66,23 @@ wait = WebDriverWait(driver, 60)
 email_field = wait.until(EC.presence_of_element_located((By.ID, "identifierId")))
 email_field.send_keys(username)
 email_field.send_keys(Keys.RETURN)
-print("帳號已輸入")
+logger.info("帳號已輸入")
 
 # 找到並填寫密碼
 password_field = wait.until(EC.presence_of_element_located((By.NAME, "Passwd")))
 password_field.send_keys(password)
 password_field.send_keys(Keys.RETURN)
-print("密碼已輸入")
+logger.info("密碼已輸入")
 
 # 找到並點擊指定的課表圖片
-timetable_img = wait.until(EC.element_to_be_clickable((By.XPATH, "//img[@src='https://campus-lite.web.app/icons/tschool/timetable.png' and @alt='學生課表']")))
-timetable_img.click()
-print("課表圖片已點擊")
+try:
+    timetable_img = wait.until(EC.element_to_be_clickable((By.XPATH, "//img[@src='https://campus-lite.web.app/icons/tschool/timetable.png' and @alt='學生課表']")))
+    timetable_img.click()
+    logger.info("課表圖片已點擊")
+except Exception as e:
+    logger.error(f"點擊課表圖片時出現錯誤: {e}")
+    driver.quit()
+    raise
 
 # 等待新分頁打開
 wait.until(lambda driver: len(driver.window_handles) > 1)
@@ -81,7 +92,7 @@ original_window = driver.current_window_handle
 
 # 切換到新分頁
 driver.switch_to.window(driver.window_handles[-1])
-print("已切換到新分頁")
+logger.info(f"已切換到新分頁: {driver.current_url}")
 
 # 等待頁面加載完成
 time.sleep(40)  # 根據實際情況調整等待時間
@@ -123,33 +134,48 @@ if timetable_data:
                 if not schedule_list[day][1]:
                     schedule_list[day][1].append(1)
 else:
-    print("未找到課表封包")
+    logger.error("未找到課表封包")
 
 # 切換回原本的分頁
 driver.switch_to.window(original_window)
-print("已切換回原本的分頁")
+logger.info(f"已切換回原本的分頁: {driver.current_url}")
 
 # 找到並點擊學習週曆圖片
-calendar_img = wait.until(EC.element_to_be_clickable((By.XPATH, "//img[@src='https://campus-lite.web.app/icons/tschool/calendar.png' and @alt='學習週曆']")))
-calendar_img.click()
-print("學習週曆圖片已點擊")
+try:
+    calendar_img = wait.until(EC.element_to_be_clickable((By.XPATH, "//img[@src='https://campus-lite.web.app/icons/tschool/calendar.png' and @alt='學習週曆']")))
+    calendar_img.click()
+    logger.info("學習週曆圖片已點擊")
+except Exception as e:
+    logger.error(f"點擊學習週曆圖片時出現錯誤: {e}")
+    driver.quit()
+    raise
 
 # 等待新分頁打開
 wait.until(lambda driver: len(driver.window_handles) > 2)
 
 # 切換到新分頁
 driver.switch_to.window(driver.window_handles[-1])
-print("已切換到學習週曆的新分頁")
+logger.info(f"已切換到學習週曆的新分頁: {driver.current_url}")
 
 # 找到並點擊「待填下週」的標籤
-next_week_tab = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='tabs tabs-boxed']/a[text()='待填下週']")))
-next_week_tab.click()
-print("已點擊「待填下週」標籤")
+try:
+    next_week_tab = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='tabs tabs-boxed']/a[text()='待填下週']")))
+    next_week_tab.click()
+    logger.info("已點擊「待填下週」標籤")
+except Exception as e:
+    logger.error(f"點擊「待填下週」標籤時出現錯誤: {e}")
+    driver.quit()
+    raise
 
 # 找到並點擊「週曆填報」按鈕
-report_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='btn btn-sm btn-neutral' and .//span[text()='週曆填報']]")))
-report_button.click()
-print("已點擊「週曆填報」按鈕")
+try:
+    report_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='btn btn-sm btn-neutral' and .//span[text()='週曆填報']]")))
+    report_button.click()
+    logger.info("已點擊「週曆填報」按鈕")
+except Exception as e:
+    logger.error(f"點擊「週曆填報」按鈕時出現錯誤: {e}")
+    driver.quit()
+    raise
 
 time.sleep(20)
 
@@ -170,9 +196,14 @@ for i, select_element in enumerate(select_elements):
             break
 
 # 點擊「回報計劃」按鈕
-report_plan_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='btn btn-neutral' and .//span[text()='回報計劃']]")))
-report_plan_button.click()
-print("已點擊「回報計劃」按鈕")
+try:
+    report_plan_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@class='btn btn-neutral' and .//span[text()='回報計劃']]")))
+    report_plan_button.click()
+    logger.info("已點擊「回報計劃」按鈕")
+except Exception as e:
+    logger.error(f"點擊「回報計劃」按鈕時出現錯誤: {e}")
+    driver.quit()
+    raise
 
 time.sleep(10)
 
