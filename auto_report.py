@@ -131,7 +131,7 @@ if timetable_data:
         periods = entry.get('節次', '').split(',')
         for period in periods:
             period = period.strip()
-            if '1' in period or '2' in period or '3' in period或 '4' in period:
+            if '1' in period or '2' in period or '3' in period or '4' in period:
                 if not schedule_list[day][0]:
                     schedule_list[day][0].append(1)
             elif '5' in period or '6' in period or '7' in period or '8' in period:
