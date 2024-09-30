@@ -78,7 +78,9 @@ logger.info("密碼已輸入")
 
 # 找到並點擊指定的課表圖片
 try:
+    logger.info("嘗試找到課表圖片元素")
     timetable_img = wait.until(EC.element_to_be_clickable((By.XPATH, "//img[@src='https://campus-lite.web.app/icons/tschool/timetable.png' and @alt='學生課表']")))
+    logger.info("課表圖片元素已找到，嘗試點擊")
     timetable_img.click()
     logger.info("課表圖片已點擊")
 except Exception as e:
@@ -129,7 +131,7 @@ if timetable_data:
         periods = entry.get('節次', '').split(',')
         for period in periods:
             period = period.strip()
-            if '1' in period or '2' in period or '3' in period or '4' in period:
+            if '1' in period or '2' in period or '3' in period或 '4' in period:
                 if not schedule_list[day][0]:
                     schedule_list[day][0].append(1)
             elif '5' in period or '6' in period or '7' in period or '8' in period:
@@ -144,7 +146,9 @@ logger.info(f"已切換回原本的分頁，正在訪問網站: {driver.current_
 
 # 找到並點擊學習週曆圖片
 try:
+    logger.info("嘗試找到學習週曆圖片元素")
     calendar_img = wait.until(EC.element_to_be_clickable((By.XPATH, "//img[@src='https://campus-lite.web.app/icons/tschool/calendar.png' and @alt='學習週曆']")))
+    logger.info("學習週曆圖片元素已找到，嘗試點擊")
     calendar_img.click()
     logger.info("學習週曆圖片已點擊")
 except Exception as e:
