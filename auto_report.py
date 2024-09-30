@@ -60,7 +60,7 @@ def open_website():
 open_website()
 
 # 設置顯性等待
-wait = WebDriverWait(driver, 60)
+wait = WebDriverWait(driver, 600)
 
 # 找到並填寫帳號
 email_field = wait.until(EC.presence_of_element_located((By.ID, "identifierId")))
