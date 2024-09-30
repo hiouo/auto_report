@@ -9,6 +9,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+from retry import retry
 
 # 設定學期第一週的開始日期（這個日期可以根據你的學校行事曆調整）
 semester_start_date = datetime(2024, 8, 30)  # 假設學期從 8 月 30 日開始
@@ -39,18 +40,21 @@ options.add_argument('--window-size=1920x1080')
 driver = webdriver.Chrome(service=service, options=options)
 
 # 設置隱性等待時間
-driver.implicitly_wait(400)
+driver.implicitly_wait(40)
 
-# 開啟目標網站
-driver.get("https://app.1campus.net/")
+@retry(tries=3, delay=5)
+def open_website():
+    # 開啟目標網站
+    driver.get("https://app.1campus.net/")
+    # 找到按鈕並點擊
+    button = driver.find_element(By.CLASS_NAME, "btn-square")
+    button.click()
+    print("按鈕已點擊")
 
-# 找到按鈕並點擊
-button = driver.find_element(By.CLASS_NAME, "btn-square")
-button.click()
-print("按鈕已點擊")
+open_website()
 
 # 設置顯性等待
-wait = WebDriverWait(driver, 600)
+wait = WebDriverWait(driver, 60)
 
 # 找到並填寫帳號
 email_field = wait.until(EC.presence_of_element_located((By.ID, "identifierId")))
