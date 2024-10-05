@@ -1,37 +1,51 @@
-name: Auto Report
+name: Daily Course Scraper
 
 on:
   schedule:
-    - cron: '0 0 * * 1'  # 每週二的午夜執行
-  workflow_dispatch:  # 手動觸發
+    - cron: '0 0 * * *'  # 每天 UTC 時間 00:00 執行一次
+  push:
+    branches:
+      - main  # 當推送到 main 分支時也會觸發
+  workflow_dispatch:  # 手動觸發工作流程
 
 jobs:
-  build:
+  scrape:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'  # 選擇你需要的 Python 版本
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.12'  # 使用 Python 3.12
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      - name: Test network speed
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y speedtest-cli
-          speedtest-cli
+    - name: Create client_secret.json
+      run: |
+        printf "%s" "${{ secrets.CLIENT_SECRET_JSON }}" > client_secret.json
 
-      - name: Run script
-        env:
-          USERNAME: ${{ secrets.USERNAME }}
-          PASSWORD: ${{ secrets.PASSWORD }}
-        run: |
-          python auto_report.py
+    - name: Print client_secret.json for debugging
+      run: |
+        cat client_secret.json
+
+    - name: Validate client_secret.json
+      run: |
+        python -c "import json; json.load(open('client_secret.json'))"
+
+    - name: Run scraper script
+      env:
+        ACCOUNT: ${{ secrets.ACCOUNT }}
+        PASSWORD: ${{ secrets.PASSWORD }}
+      run: python main.py
+
+    - name: Upload added_courses.json
+      uses: actions/upload-artifact@v3
+      with:
+        name: added_courses
+        path: added_courses.json
