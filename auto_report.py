@@ -119,7 +119,8 @@ if timetable_data:
     for entry in timetable_data:
         week_str = entry.get('週次', '').strip()
         day = entry.get('星期', '').strip()
-        if week_str.isdigit() and int(week_str) == next_week and day != '':
+        course_name = entry.get('課程名稱', '').strip()
+        if week_str.isdigit() and int(week_str) == next_week and day != '' and course_name != '跨校網路選修':
             next_week_schedule.append(entry)
 
     # 初始化嵌套列表結構
